@@ -35,6 +35,15 @@ public class BairroService {
         }
 
 
+        //Validações do tamanho dos valores dos campos
+        if (bairroDto.codigoMunicipio() > 999999999) {
+            throw new IllegalArgumentException("O campo codigoMunicipio deve ter no máximo 9 dígitos");
+        }
+        if (bairroDto.nome().length() > 256) {
+            throw new IllegalArgumentException("O campo nome deve conter no máximo 256 letras");
+        }
+
+
         //Validações dos valores dos campos
         if (!(String.valueOf(bairroDto.codigoMunicipio()).matches("^[0-9]+$"))) {
             throw new IllegalArgumentException("O campo codigoUF deve conter apenas números inteiros positivos.");
@@ -83,6 +92,18 @@ public class BairroService {
         }
         if (novoBairro.nome() == null || novoBairro.nome().isEmpty()) {
             throw new IllegalArgumentException("Não foi possível alterar o Bairro no banco de dados. Motivo: o campo nome é obrigatório.");
+        }
+
+
+        //Validações do tamanho dos valores dos campos
+        if (novoBairro.codigoBairro() > 999999999) {
+            throw new IllegalArgumentException("O campo codigoBairro deve ter no máximo 9 dígitos");
+        }
+        if (novoBairro.codigoMunicipio() > 999999999) {
+            throw new IllegalArgumentException("O campo codigoMunicipio deve ter no máximo 9 dígitos");
+        }
+        if (novoBairro.nome().length() > 256) {
+            throw new IllegalArgumentException("O campo nome deve conter no máximo 256 letras");
         }
 
 
@@ -156,17 +177,24 @@ public class BairroService {
         }
 
 
+        //Validações do tamanho dos valores dos campos
+        if (bairroDto.codigoBairro() != null && bairroDto.codigoBairro() > 999999999) {
+            throw new IllegalArgumentException("O campo codigoBairro deve ter no máximo 9 dígitos");
+        }
+        if (bairroDto.codigoMunicipio() != null && bairroDto.codigoMunicipio() > 999999999) {
+            throw new IllegalArgumentException("O campo codigoMunicipio deve ter no máximo 9 dígitos");
+        }
+        if (bairroDto.nome() != null && bairroDto.nome().length() > 256) {
+            throw new IllegalArgumentException("O campo nome deve conter no máximo 256 letras");
+        }
+
+
         //Validações dos valores dos campos
         if (bairroDto.codigoMunicipio() != null && !(String.valueOf(bairroDto.codigoMunicipio()).matches("^[0-9]+$"))) {
             throw new IllegalArgumentException("O campo codigoMunicipio deve conter apenas números inteiros positivos.");
         }
-        if (bairroDto.nome() != null) {
-            if (bairroDto.nome().length() > 256) {
-                throw new IllegalArgumentException("O campo nome deve conter no máximo 256 caracteres.");
-            }
-            if (!(bairroDto.nome().matches("^[A-ZÀ-Ÿ0-9 ]+$")) || bairroDto.nome().trim().isEmpty()) {
-                throw new IllegalArgumentException("O campo nome deve conter apenas letras em maiúsculo e números.");
-            }
+        if (bairroDto.nome() != null && (!(bairroDto.nome().matches("^[A-ZÀ-Ÿ0-9 ]+$")) || bairroDto.nome().trim().isEmpty())) {
+            throw new IllegalArgumentException("O campo nome deve conter apenas letras em maiúsculo e números.");
         }
         if (bairroDto.status() != null && bairroDto.status() != 1 && bairroDto.status() != 2) {
             throw new IllegalArgumentException("O campo status deve ser informado apenas os número 1 (ativado) ou 2 (desativado).");

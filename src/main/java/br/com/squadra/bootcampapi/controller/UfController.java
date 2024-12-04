@@ -77,4 +77,17 @@ public class UfController {
         return ResponseEntity.ok(ufRepository.findAll());
     }
 
+    @DeleteMapping
+    public ResponseEntity<Object> deletar(@RequestParam(value = "codigoUF", required = true) Long codigoUF){
+        try {
+            System.out.println("UF recebida: " + codigoUF);
+            ufService.deletar(codigoUF);
+        } catch (IllegalArgumentException e) {
+            var erroDTO = ErroResposta.respostaPadrao(e.getMessage());
+            return ResponseEntity.status(erroDTO.status()).body(erroDTO);
+        }
+
+        return ResponseEntity.ok(ufRepository.findAll());
+    }
+
 }

@@ -35,6 +35,15 @@ public class MunicipioService {
         }
 
 
+        //Validação do tamanho dos valores dos campos
+        if (municipioDto.codigoUF() > 999999999) {
+            throw new IllegalArgumentException("O campo codigoUF deve ter no máximo 9 dígitos");
+        }
+        if (municipioDto.nome().length() > 60) {
+            throw new IllegalArgumentException("O campo nome deve conter no máximo 60 letras");
+        }
+
+
         //Validações dos valores dos campos
         if ((String.valueOf(municipioDto.codigoMunicipio()).matches("^[0-9]+$"))) {
             throw new IllegalArgumentException("O campo codigoUF deve conter apenas números inteiros positivos.");
@@ -84,6 +93,18 @@ public class MunicipioService {
         }
         if (novoMunicipio.status() == null) {
             throw new IllegalArgumentException("Não foi possível alterar o Município no banco de dados. Motivo: o campo status é obrigatório.");
+        }
+
+
+        //Validação do tamanho dos valores dos campos
+        if (novoMunicipio.codigoMunicipio() > 999999999) {
+            throw new IllegalArgumentException("O campo codigoMunicipio deve ter no máximo 9 dígitos");
+        }
+        if (novoMunicipio.codigoUF() > 999999999) {
+            throw new IllegalArgumentException("O campo codigoUF deve ter no máximo 9 dígitos");
+        }
+        if (novoMunicipio.nome().length() > 60) {
+            throw new IllegalArgumentException("O campo nome deve conter no máximo 60 letras");
         }
 
 
@@ -156,17 +177,24 @@ public class MunicipioService {
         }
 
 
+        //Validação do tamanho dos valores dos campos
+        if (municipioDTO.codigoMunicipio() != null && municipioDTO.codigoMunicipio() > 999999999) {
+            throw new IllegalArgumentException("O campo codigoMunicipio deve ter no máximo 9 dígitos");
+        }
+        if (municipioDTO.codigoUF() != null && municipioDTO.codigoUF() > 999999999) {
+            throw new IllegalArgumentException("O campo codigoUF deve ter no máximo 9 dígitos");
+        }
+        if (municipioDTO.nome() != null && municipioDTO.nome().length() > 60) {
+            throw new IllegalArgumentException("O campo nome deve conter no máximo 60 letras");
+        }
+
+
         //Validações dos valores dos campos
         if (municipioDTO.codigoUF() != null && !(String.valueOf(municipioDTO.codigoUF()).matches("^[0-9]+$"))) {
             throw new IllegalArgumentException("O campo codigoUF deve conter apenas números inteiros positivos.");
         }
-        if (municipioDTO.nome() != null) {
-            if (municipioDTO.nome().length() > 256) {
-                throw new IllegalArgumentException("O campo nome deve conter no máximo 256 caracteres.");
-            }
-            if (!(municipioDTO.nome().matches("^[A-ZÀ-Ÿ ]+$")) || municipioDTO.nome().trim().isEmpty()) {
+        if (municipioDTO.nome() != null && (!(municipioDTO.nome().matches("^[A-ZÀ-Ÿ ]+$")) || municipioDTO.nome().trim().isEmpty())) {
                 throw new IllegalArgumentException("O campo nome deve conter apenas letras em maiúsculo.");
-            }
         }
         if (municipioDTO.status() != null && municipioDTO.status() != 1 && municipioDTO.status() != 2) {
             throw new IllegalArgumentException("O campo status deve ser informado apenas os número 1 (ativado) ou 2 (desativado).");

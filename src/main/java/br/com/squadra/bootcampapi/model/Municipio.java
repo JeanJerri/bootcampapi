@@ -32,7 +32,7 @@ public class Municipio {
 //    @JsonIgnore
     private Uf uf;
 
-    @OneToMany(mappedBy = "municipio")
+    @OneToMany(mappedBy = "municipio", cascade = CascadeType.ALL, orphanRemoval = true)
 //    @ToString.Exclude
     @JsonIgnore
     private List<Bairro> bairros;

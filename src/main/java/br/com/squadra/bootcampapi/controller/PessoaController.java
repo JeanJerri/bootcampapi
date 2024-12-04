@@ -57,7 +57,6 @@ public class PessoaController {
             pessoa.setStatus(status);
             System.out.println("Pessoa recebida: " + pessoa);
 
-            System.out.println("teste");
             return pessoaService.pegar(pessoas, PessoaMapper.mapearParaPessoa(pessoa));
         } catch (IllegalArgumentException e) {
             var erroDTO = ErroResposta.respostaPadrao(e.getMessage());

@@ -31,7 +31,8 @@ public class Bairro {
     @ToString.Exclude
     private Municipio municipio;
 
-    @OneToMany(mappedBy = "bairro") //Em mappedBy, colocar o nome do atributo/variável que referencia a classe atual (Bairro) na outra classe (Endereco)
+    @OneToMany(mappedBy = "bairro", cascade = CascadeType.ALL, orphanRemoval = true)
+    //Em mappedBy, colocar o nome do atributo/variável que referencia a classe atual (Bairro) na outra classe (Endereco)
 //    @ToString.Exclude
     @JsonIgnore
     private List<Endereco> enderecos;

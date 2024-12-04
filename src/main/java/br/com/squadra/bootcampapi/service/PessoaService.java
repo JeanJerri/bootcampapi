@@ -1,5 +1,6 @@
 package br.com.squadra.bootcampapi.service;
 
+import br.com.squadra.bootcampapi.controller.dto.EnderecoDTO;
 import br.com.squadra.bootcampapi.controller.dto.PessoaDTO;
 import br.com.squadra.bootcampapi.controller.mapper.PessoaMapper;
 import br.com.squadra.bootcampapi.model.Bairro;
@@ -54,6 +55,21 @@ public class PessoaService {
         }
 
 
+        //Validações do tamanho dos valores dos campos
+        if (pessoaDTO.nome().length() > 256) {
+            throw new IllegalArgumentException("O campo nome deve conter no máximo 256 letras");
+        }
+        if (pessoaDTO.sobrenome().length() > 256) {
+            throw new IllegalArgumentException("O campo sobrenome deve conter no máximo 256 letras");
+        }
+        if (pessoaDTO.idade() > 999) {
+            throw new IllegalArgumentException("O campo idade deve conter no máximo 3 dígitos");
+        }
+        if (pessoaDTO.login().length() < 8 || pessoaDTO.login().length() > 50) {
+            throw new IllegalArgumentException("O campo login deve conter entre 8 e 50 caracteres");
+        }
+
+
         //Validações dos valores dos campos
         if (!(pessoaDTO.nome().matches("^[A-ZÀ-Ÿ ]+$")) || pessoaDTO.nome().trim().isEmpty()) {
             throw new IllegalArgumentException("O campo nome deve conter apenas letras em maiúsculo.");
@@ -93,65 +109,102 @@ public class PessoaService {
         pessoa.setLogin(pessoaDTO.login());
         pessoa.setSenha(pessoaDTO.senha());
         pessoa.setStatus(pessoaDTO.status());
-        pessoa.setEnderecos(
-                pessoaDTO.enderecos().stream().map(
-                        enderecoDTO -> {
 
-                            //Validações da presença dos campos
-                            if (enderecoDTO.codigoBairro() == null) {
-                                throw new IllegalArgumentException("Não foi possível salvar o Endereço no banco de dados. Motivo: o campo codigoBairro no endereço é obrigatório.");
-                            }
-                            if (enderecoDTO.nomeRua() == null || enderecoDTO.nomeRua().isEmpty()) {
-                                throw new IllegalArgumentException("Não foi possível salvar o Endereço no banco de dados. Motivo: o campo nomeRua no endereço é obrigatório.");
-                            }
-                            if (enderecoDTO.numero() == null || enderecoDTO.numero().isEmpty()) {
-                                throw new IllegalArgumentException("Não foi possível salvar o Endereço no banco de dados. Motivo: o campo numero no endereço é obrigatório.");
-                            }
-                            if (enderecoDTO.complemento() == null || enderecoDTO.complemento().isEmpty()) {
-                                throw new IllegalArgumentException("Não foi possível salvar o Endereço no banco de dados. Motivo: o campo complemento no endereço é obrigatório.");
-                            }
-                            if (enderecoDTO.cep() == null || enderecoDTO.cep().isEmpty()) {
-                                throw new IllegalArgumentException("Não foi possível salvar o Endereço no banco de dados. Motivo: o campo cep no endereço é obrigatório.");
-                            }
+        List<Endereco> enderecos = pessoaDTO.enderecos().stream().map(
+                enderecoDTO -> {
 
-
-                            //Validações dos valores dos campos
-                            if (!(String.valueOf(enderecoDTO.codigoBairro()).matches("^[0-9]+$"))) {
-                                throw new IllegalArgumentException("O campo codigoBairro deve conter apenas números inteiros positivos.");
-                            }
-                            if (!(enderecoDTO.nomeRua().matches("^[A-ZÀ-Ÿ0-9 ]+$")) || enderecoDTO.nomeRua().trim().isEmpty()) {
-                                throw new IllegalArgumentException("O campo nomeRua deve conter apenas letras em maiúsculo e números.");
-                            }
-                            if (!(enderecoDTO.numero().matches("^[A-Z0-9]+$")) || enderecoDTO.numero().trim().isEmpty()) {
-                                throw new IllegalArgumentException("O campo numero deve conter apenas números e letras em maiúsculo sem acento.");
-                            }
-                            if (!(enderecoDTO.complemento().matches("^[A-ZÀ-Ÿ ]+$")) || enderecoDTO.complemento().trim().isEmpty()) {
-                                throw new IllegalArgumentException("O campo complemento deve conter apenas letras em maiúsculo.");
-                            }
-                            if (!enderecoDTO.cep().matches("^\\d{5}-\\d{3}$")) {
-                                throw new IllegalArgumentException("O campo CEP deve estar no formato '00000-000'.");
-                            }
+                    //Validações da presença dos campos
+                    if (enderecoDTO.codigoBairro() == null) {
+                        throw new IllegalArgumentException("Não foi possível salvar o Endereço no banco de dados. Motivo: o campo codigoBairro no endereço é obrigatório.");
+                    }
+                    if (enderecoDTO.nomeRua() == null || enderecoDTO.nomeRua().isEmpty()) {
+                        throw new IllegalArgumentException("Não foi possível salvar o Endereço no banco de dados. Motivo: o campo nomeRua no endereço é obrigatório.");
+                    }
+                    if (enderecoDTO.numero() == null || enderecoDTO.numero().isEmpty()) {
+                        throw new IllegalArgumentException("Não foi possível salvar o Endereço no banco de dados. Motivo: o campo numero no endereço é obrigatório.");
+                    }
+                    if (enderecoDTO.complemento() == null || enderecoDTO.complemento().isEmpty()) {
+                        throw new IllegalArgumentException("Não foi possível salvar o Endereço no banco de dados. Motivo: o campo complemento no endereço é obrigatório.");
+                    }
+                    if (enderecoDTO.cep() == null || enderecoDTO.cep().isEmpty()) {
+                        throw new IllegalArgumentException("Não foi possível salvar o Endereço no banco de dados. Motivo: o campo cep no endereço é obrigatório.");
+                    }
 
 
-                            //Validações de existência
-                            Bairro bairro = bairroRepository.findByCodigoBairro(enderecoDTO.codigoBairro());
-                            if (bairro == null) {
-                                throw new IllegalArgumentException("Não foi possível salvar o Endereço no banco de dados. Motivo: o bairro não está cadastrado.");
-                            }
+                    //Validações dos tamanhos dos valores dos campos
+                    if (enderecoDTO.codigoPessoa() > 999999999) {
+                        throw new IllegalArgumentException("O campo codigoPessoa deve ter no máximo 9 dígitos");
+                    }
+                    if (enderecoDTO.codigoBairro() > 999999999) {
+                        throw new IllegalArgumentException("O campo codigoBairro deve ter no máximo 9 dígitos");
+                    }
+                    if (enderecoDTO.nomeRua().length() > 256) {
+                        throw new IllegalArgumentException("O campo nomeRua deve conter no máximo 256 letras");
+                    }
+                    if (enderecoDTO.numero().length() > 10) {
+                        throw new IllegalArgumentException("O campo numero deve conter no máximo 10 caracteres");
+                    }
+                    if (enderecoDTO.complemento().length() > 20) {
+                        throw new IllegalArgumentException("O campo complemento deve conter no máximo 20 letras");
+                    }
 
 
-                            Endereco endereco = new Endereco();
-                            endereco.setLogradouro(enderecoDTO.nomeRua());
-                            endereco.setNumero(enderecoDTO.numero());
-                            endereco.setComplemento(enderecoDTO.complemento());
-                            endereco.setCep(enderecoDTO.cep());
-                            endereco.setPessoa(pessoa);
-                            endereco.setBairro(bairro);
+                    //Validações dos valores dos campos
+                    if (!(String.valueOf(enderecoDTO.codigoBairro()).matches("^[0-9]+$"))) {
+                        throw new IllegalArgumentException("O campo codigoBairro deve conter apenas números inteiros positivos.");
+                    }
+                    if (!(enderecoDTO.nomeRua().matches("^[A-ZÀ-Ÿ0-9 ]+$")) || enderecoDTO.nomeRua().trim().isEmpty()) {
+                        throw new IllegalArgumentException("O campo nomeRua deve conter apenas letras em maiúsculo e números.");
+                    }
+                    if (!(enderecoDTO.numero().matches("^[A-Z0-9]+$")) || enderecoDTO.numero().trim().isEmpty()) {
+                        throw new IllegalArgumentException("O campo numero deve conter apenas números e letras em maiúsculo sem acento.");
+                    }
+                    if (!(enderecoDTO.complemento().matches("^[A-ZÀ-Ÿ ]+$")) || enderecoDTO.complemento().trim().isEmpty()) {
+                        throw new IllegalArgumentException("O campo complemento deve conter apenas letras em maiúsculo.");
+                    }
+                    if (!enderecoDTO.cep().matches("^\\d{5}-\\d{3}$")) {
+                        throw new IllegalArgumentException("O campo CEP deve estar no formato '00000-000'.");
+                    }
 
-                            return endereco;
-                        }
-                ).collect(Collectors.toList())
-        );
+
+                    //Validações de existência
+                    Bairro bairro = bairroRepository.findByCodigoBairro(enderecoDTO.codigoBairro());
+                    if (bairro == null) {
+                        throw new IllegalArgumentException("Não foi possível salvar o Endereço no banco de dados. Motivo: o bairro não está cadastrado.");
+                    }
+
+
+                    Endereco endereco = new Endereco();
+                    endereco.setLogradouro(enderecoDTO.nomeRua());
+                    endereco.setNumero(enderecoDTO.numero());
+                    endereco.setComplemento(enderecoDTO.complemento());
+                    endereco.setCep(enderecoDTO.cep());
+                    endereco.setPessoa(pessoa);
+                    endereco.setBairro(bairro);
+
+                    return endereco;
+                }
+        ).collect(Collectors.toList());
+
+
+        // Validação para impedir que um endereço repetido seja cadastrado na mesma pessoa.
+        // Não coloquei o cep porque tem chances de ser mudado e não coloquei o complemento porque é variável.
+        System.out.println(enderecos.size());
+        if(enderecos.size() > 1) {
+            for (int i = 0; i < enderecos.size(); i++) {
+                int e1 = i, e2 = i + 1;
+                if(
+                    enderecos.get(e1).getBairro().getCodigoBairro().equals(enderecos.get(e2).getBairro().getCodigoBairro()) &&
+                    enderecos.get(e1).getLogradouro().equals(enderecos.get(e2).getLogradouro()) &&
+                    enderecos.get(e1).getNumero().equals(enderecos.get(e2).getNumero())
+                ) {
+                    throw new IllegalArgumentException("Não foi possível cadastrar os endereços pois os endereços que estão sendo cadastrados estão repetidos");
+                }
+            }
+        }
+
+        pessoa.setEnderecos(enderecos);
+
 
         return pessoaRepository.save(pessoa);
     }
@@ -184,6 +237,25 @@ public class PessoaService {
         if (pessoaDTO.enderecos() == null || pessoaDTO.enderecos().isEmpty()) {
             throw new IllegalArgumentException("Não foi possível salvar a Pessoa no banco de dados. Motivo: o campo enderecos é obrigatório, informe pelo menos 1 endereço.");
         }
+
+
+        //Validações do tamanho dos valores dos campos
+        if (pessoaDTO.codigoPessoa() > 999999999) {
+            throw new IllegalArgumentException("O campo codigoPessoa deve ter no máximo 9 dígitos");
+        }
+        if (pessoaDTO.nome().length() > 256) {
+            throw new IllegalArgumentException("O campo nome deve conter no máximo 256 letras");
+        }
+        if (pessoaDTO.sobrenome().length() > 256) {
+            throw new IllegalArgumentException("O campo sobrenome deve conter no máximo 256 letras");
+        }
+        if (pessoaDTO.idade() > 999) {
+            throw new IllegalArgumentException("O campo idade deve conter no máximo 3 dígitos");
+        }
+        if (pessoaDTO.login().length() < 8 || pessoaDTO.login().length() > 50) {
+            throw new IllegalArgumentException("O campo login deve conter entre 8 e 50 caracteres");
+        }
+
 
         //Validações dos valores dos campos
         if (!(String.valueOf(pessoaDTO.codigoPessoa()).matches("^[0-9]+$"))) {
@@ -228,8 +300,10 @@ public class PessoaService {
             throw new IllegalArgumentException("Não foi possível alterar a Pessoa no banco de dados. Motivo: o nome e sobrenome já existem em um outro registro cadastrado no banco de dados.");
         }
 
-//        //Precisa verificar se os endereços também são iguais
-//        //Validação de status ativado/desativado
+
+//        Validação de status ativado/desativado
+//        Precisa verificar se os endereços também são iguais
+//        Validação para implementar como melhoria futuramente
 //        if (
 //                pessoaDTO.nome().equals(pessoaAntiga.getNome()) &&
 //                pessoaDTO.sobrenome().equals(pessoaAntiga.getSobrenome()) &&
@@ -239,9 +313,9 @@ public class PessoaService {
 //                pessoaDTO.status().equals(pessoaAntiga.getStatus())
 //        ) {
 //            if (pessoaDTO.status() == 1) {
-//                throw new IllegalArgumentException("Não foi possível alterar o status do Bairro no banco de dados, pois o Bairro já está ativo.");
+//                throw new IllegalArgumentException("Não foi possível alterar o status de Pessoa no banco de dados, pois o Pessoa já está ativo.");
 //            } else {
-//                throw new IllegalArgumentException("Não foi possível alterar o status do Bairro no banco de dados, pois o Bairro já está inativo.");
+//                throw new IllegalArgumentException("Não foi possível alterar o status do Pessoa no banco de dados, pois o Pessoa já está inativo.");
 //            }
 //        }
 
@@ -276,6 +350,27 @@ public class PessoaService {
                     }
                     if (enderecoDTO.cep() == null || enderecoDTO.cep().isEmpty()) {
                         throw new IllegalArgumentException("Não foi possível alterar o Endereço no banco de dados. Motivo: o campo cep no endereço é obrigatório.");
+                    }
+
+
+                    //Validações dos tamanhos dos valores dos campos
+                    if (enderecoDTO.codigoEndereco() > 999999999) {
+                        throw new IllegalArgumentException("O campo codigoEndereco deve ter no máximo 9 dígitos");
+                    }
+                    if (enderecoDTO.codigoPessoa() > 999999999) {
+                        throw new IllegalArgumentException("O campo codigoPessoa deve ter no máximo 9 dígitos");
+                    }
+                    if (enderecoDTO.codigoBairro() > 999999999) {
+                        throw new IllegalArgumentException("O campo codigoBairro deve ter no máximo 9 dígitos");
+                    }
+                    if (enderecoDTO.nomeRua().length() > 256) {
+                        throw new IllegalArgumentException("O campo nomeRua deve conter no máximo 256 letras");
+                    }
+                    if (enderecoDTO.numero().length() > 10) {
+                        throw new IllegalArgumentException("O campo numero deve conter no máximo 10 caracteres");
+                    }
+                    if (enderecoDTO.complemento().length() > 20) {
+                        throw new IllegalArgumentException("O campo complemento deve conter no máximo 20 letras");
                     }
 
 
@@ -319,9 +414,6 @@ public class PessoaService {
                     }
 
 
-                    //Testar se é possível ter duplicidade de endereços
-                    //Validações de duplicidade
-
                     Endereco endereco = enderecoDTO.codigoEndereco() != null
                             ? enderecoRepository.findByCodigoEndereco(enderecoDTO.codigoEndereco())
                             : new Endereco();
@@ -340,6 +432,24 @@ public class PessoaService {
 
                     return endereco;
                 }).toList();
+
+
+        // Validação para impedir que um endereço repetido seja cadastrado na mesma pessoa.
+        // Não coloquei o cep porque tem chances de ser mudado e não coloquei o complemento porque é variável.
+        System.out.println(enderecosNovosEAtualizados.size());
+        if(enderecosNovosEAtualizados.size() > 1) {
+            for (int i = 0; i < enderecosNovosEAtualizados.size(); i++) {
+                int e1 = i, e2 = i + 1;
+                if(
+                        enderecosNovosEAtualizados.get(e1).getBairro().getCodigoBairro().equals(enderecosNovosEAtualizados.get(e2).getBairro().getCodigoBairro()) &&
+                        enderecosNovosEAtualizados.get(e1).getLogradouro().equals(enderecosNovosEAtualizados.get(e2).getLogradouro()) &&
+                        enderecosNovosEAtualizados.get(e1).getNumero().equals(enderecosNovosEAtualizados.get(e2).getNumero())
+                ) {
+                    throw new IllegalArgumentException("Não foi possível alterar os endereços pois os endereços que estão sendo cadastrados estão repetidos");
+                }
+            }
+        }
+
 
         List<Endereco> enderecosNoBanco = pessoaAntiga.getEnderecos(); //pega apenas a referência e as demais alteraçõe feitas nessa lista refletem na pessoaAntiga
         List<Endereco> enderecosAtualizados = enderecosNovosEAtualizados.stream().filter(
@@ -375,6 +485,15 @@ public class PessoaService {
         //Sem parâmetros
         if (pessoaDTO.status() == null && pessoaDTO.codigoPessoa() == null && pessoaDTO.login() == null) {
             return ResponseEntity.ok(pessoaRepository.findAll().stream().map(PessoaMapper::mapearParaPessoa).toList());
+        }
+
+
+        //Validações do tamanho dos valores dos campos
+        if (pessoaDTO.codigoPessoa() != null && pessoaDTO.codigoPessoa() > 999999999) {
+            throw new IllegalArgumentException("O campo codigoPessoa deve ter no máximo 9 dígitos");
+        }
+        if (pessoaDTO.login() != null && (pessoaDTO.login().length() < 8 || pessoaDTO.login().length() > 50)) {
+            throw new IllegalArgumentException("O campo login deve conter entre 8 e 50 caracteres");
         }
 
 

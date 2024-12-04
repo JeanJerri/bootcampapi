@@ -26,7 +26,7 @@ public class Uf {
     @Column(name = "STATUS", length = 3, nullable = false)
     private Integer status;
 
-    @OneToMany(mappedBy = "uf")
+    @OneToMany(mappedBy = "uf", cascade = CascadeType.ALL, orphanRemoval = true)
 //    @ToString.Exclude
     @JsonIgnore
     private List<Municipio> municipios;
