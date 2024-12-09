@@ -29,15 +29,6 @@ public class UfService {
         }
 
 
-        //Validações do tamanho dos valores dos campos
-        if (ufDto.sigla().length() > 2) {
-            throw new IllegalArgumentException("O campo sigla deve conter 2 letras");
-        }
-        if (ufDto.nome().length() > 60) {
-            throw new IllegalArgumentException("O campo nome deve conter no máximo 60 letras");
-        }
-
-
         //Validações dos valores dos campos
         if (!(ufDto.nome().matches("^[A-ZÀ-Ÿ ]+$")) || ufDto.nome().trim().isEmpty()) {
             throw new IllegalArgumentException("O campo nome deve conter apenas letras em maiúsculo.");
@@ -47,6 +38,15 @@ public class UfService {
         }
         if (ufDto.status() != 1 && ufDto.status() != 2) {
             throw new IllegalArgumentException("O campo status deve ser informado apenas os número 1 (ativado) ou 2 (desativado).");
+        }
+
+
+        //Validações do tamanho dos valores dos campos
+        if (ufDto.sigla().length() > 2) {
+            throw new IllegalArgumentException("O campo sigla deve conter 2 letras");
+        }
+        if (ufDto.nome().length() > 60) {
+            throw new IllegalArgumentException("O campo nome deve conter no máximo 60 letras");
         }
 
 
@@ -84,18 +84,6 @@ public class UfService {
         }
 
 
-        //Validações do tamanho dos valores dos campos
-        if (novaUf.codigoUF() > 999999999) {
-            throw new IllegalArgumentException("O campo codigoUF deve ter no máximo 9 dígitos");
-        }
-        if (novaUf.sigla().length() > 2) {
-            throw new IllegalArgumentException("O campo sigla deve conter 2 letras");
-        }
-        if (novaUf.nome().length() > 60) {
-            throw new IllegalArgumentException("O campo nome deve conter no máximo 60 letras");
-        }
-
-
         //Validações dos valores dos campos
         if (!(String.valueOf(novaUf.codigoUF()).matches("^[0-9]+$"))) {
             throw new IllegalArgumentException("O campo codigoUF deve conter apenas números inteiros positivos.");
@@ -108,6 +96,18 @@ public class UfService {
         }
         if (novaUf.status() != 1 && novaUf.status() != 2) {
             throw new IllegalArgumentException("O campo status deve ser informado apenas os número 1 (ativado) ou 2 (desativado).");
+        }
+
+
+        //Validações do tamanho dos valores dos campos
+        if (novaUf.codigoUF() > 999999999) {
+            throw new IllegalArgumentException("O campo codigoUF deve ter no máximo 9 dígitos");
+        }
+        if (novaUf.sigla().length() > 2) {
+            throw new IllegalArgumentException("O campo sigla deve conter 2 letras");
+        }
+        if (novaUf.nome().length() > 60) {
+            throw new IllegalArgumentException("O campo nome deve conter no máximo 60 letras");
         }
 
 
@@ -156,18 +156,6 @@ public class UfService {
         }
 
 
-        //Validações do tamanho dos valores dos campos
-        if (ufDto.codigoUF() != null && ufDto.codigoUF() > 999999999) {
-            throw new IllegalArgumentException("O campo codigoUF deve ter no máximo 9 dígitos");
-        }
-        if (ufDto.sigla() != null && ufDto.sigla().length() > 2) {
-            throw new IllegalArgumentException("O campo sigla deve conter 2 letras");
-        }
-        if (ufDto.nome() != null && ufDto.nome().length() > 60) {
-            throw new IllegalArgumentException("O campo nome deve conter no máximo 60 letras");
-        }
-
-
         //Validações dos valores dos campos
         if (ufDto.codigoUF() != null && !(String.valueOf(ufDto.codigoUF()).matches("^[0-9]+$"))) {
             throw new IllegalArgumentException("O campo códigoUF deve conter apenas números inteiros positivos.");
@@ -180,6 +168,18 @@ public class UfService {
         }
         if (ufDto.sigla() != null && ((!(ufDto.sigla().matches("^[A-Z]{2}$")) || ufDto.sigla().trim().isEmpty()))) {
             throw new IllegalArgumentException("O campo sigla deve conter apenas 2 letras, sem acentos e em maiúsculo.");
+        }
+
+
+        //Validações do tamanho dos valores dos campos
+        if (ufDto.codigoUF() != null && ufDto.codigoUF() > 999999999) {
+            throw new IllegalArgumentException("O campo codigoUF deve ter no máximo 9 dígitos");
+        }
+        if (ufDto.sigla() != null && ufDto.sigla().length() > 2) {
+            throw new IllegalArgumentException("O campo sigla deve conter 2 letras");
+        }
+        if (ufDto.nome() != null && ufDto.nome().length() > 60) {
+            throw new IllegalArgumentException("O campo nome deve conter no máximo 60 letras");
         }
 
 
@@ -226,14 +226,14 @@ public class UfService {
             throw new IllegalArgumentException("Não foi possível deletar o UF no banco de dados. Motivo: o campo codigoUF é obrigatório.");
         }
 
-        //Validações do tamanho dos valores dos campos
-        if (codigoUF > 999999999) {
-            throw new IllegalArgumentException("O campo codigoUF deve ter no máximo 9 dígitos");
-        }
-
         //Validações dos valores dos campos
         if (!(String.valueOf(codigoUF).matches("^[0-9]+$"))) {
             throw new IllegalArgumentException("O campo codigoUF deve conter apenas números inteiros positivos.");
+        }
+
+        //Validações do tamanho dos valores dos campos
+        if (codigoUF > 999999999) {
+            throw new IllegalArgumentException("O campo codigoUF deve ter no máximo 9 dígitos");
         }
 
         //Validações de existência

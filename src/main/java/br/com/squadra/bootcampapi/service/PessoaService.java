@@ -1,6 +1,5 @@
 package br.com.squadra.bootcampapi.service;
 
-import br.com.squadra.bootcampapi.controller.dto.EnderecoDTO;
 import br.com.squadra.bootcampapi.controller.dto.PessoaDTO;
 import br.com.squadra.bootcampapi.controller.mapper.PessoaMapper;
 import br.com.squadra.bootcampapi.model.Bairro;
@@ -68,6 +67,9 @@ public class PessoaService {
         if (pessoaDTO.login().length() < 8 || pessoaDTO.login().length() > 50) {
             throw new IllegalArgumentException("O campo login deve conter entre 8 e 50 caracteres");
         }
+        if (pessoaDTO.senha().length() < 4 || pessoaDTO.senha().length() > 50) {
+            throw new IllegalArgumentException("O campo senha deve conter entre 4 e 50 caracteres");
+        }
 
 
         //Validações dos valores dos campos
@@ -80,13 +82,11 @@ public class PessoaService {
         if (pessoaDTO.idade() < 0) {
             throw new IllegalArgumentException("O campo idade deve ser um número inteiro não negativo.");
         }
-        if (pessoaDTO.login().length() < 8 || pessoaDTO.login().length() > 50 || !pessoaDTO.login().matches("^[a-z0-9\\-_*@.]+$")) {
-            throw new IllegalArgumentException("O campo login deve conter entre 8 e 50 caracteres em letras minúsculas e sem acentos. " +
-                    "Só são permitidos letras, números e os caracteres (.-_*@) e sem espaço.");
+        if (!pessoaDTO.login().matches("^[a-z0-9\\-_*@.]+$") || pessoaDTO.login().trim().isEmpty()) {
+            throw new IllegalArgumentException("Só são permitidos letras em letras minúsculas e sem acentos, números e os caracteres (.-_*@) e sem espaço.");
         }
-        if (pessoaDTO.senha().length() < 4 || pessoaDTO.senha().length() > 50 || !pessoaDTO.senha().matches("^[a-z0-9]+$")) {
-            throw new IllegalArgumentException("O campo senha deve conter entre 4 e 50 caracteres em letras minúsculas e sem acentos. " +
-                    "Só são permitidos letras e números sem espaço.");
+        if (!pessoaDTO.senha().matches("^[a-z0-9]+$") || pessoaDTO.senha().trim().isEmpty()) {
+            throw new IllegalArgumentException("Só são permitidos letras em letras minúsculas e sem acentos, e números sem espaço.");
         }
         if (pessoaDTO.status() != 1 && pessoaDTO.status() != 2) {
             throw new IllegalArgumentException("O campo status deve ser informado apenas os número 1 (ativado) ou 2 (desativado) .");
@@ -132,9 +132,6 @@ public class PessoaService {
 
 
                     //Validações dos tamanhos dos valores dos campos
-                    if (enderecoDTO.codigoPessoa() > 999999999) {
-                        throw new IllegalArgumentException("O campo codigoPessoa deve ter no máximo 9 dígitos");
-                    }
                     if (enderecoDTO.codigoBairro() > 999999999) {
                         throw new IllegalArgumentException("O campo codigoBairro deve ter no máximo 9 dígitos");
                     }
@@ -162,7 +159,7 @@ public class PessoaService {
                     if (!(enderecoDTO.complemento().matches("^[A-ZÀ-Ÿ ]+$")) || enderecoDTO.complemento().trim().isEmpty()) {
                         throw new IllegalArgumentException("O campo complemento deve conter apenas letras em maiúsculo.");
                     }
-                    if (!enderecoDTO.cep().matches("^\\d{5}-\\d{3}$")) {
+                    if (!enderecoDTO.cep().matches("^\\d{5}-\\d{3}$") || enderecoDTO.cep().trim().isEmpty()) {
                         throw new IllegalArgumentException("O campo CEP deve estar no formato '00000-000'.");
                     }
 
@@ -191,12 +188,12 @@ public class PessoaService {
         // Não coloquei o cep porque tem chances de ser mudado e não coloquei o complemento porque é variável.
         System.out.println(enderecos.size());
         if(enderecos.size() > 1) {
-            for (int i = 0; i < enderecos.size(); i++) {
+            for (int i = 0; i < enderecos.size()-1; i++) {
                 int e1 = i, e2 = i + 1;
                 if(
-                    enderecos.get(e1).getBairro().getCodigoBairro().equals(enderecos.get(e2).getBairro().getCodigoBairro()) &&
-                    enderecos.get(e1).getLogradouro().equals(enderecos.get(e2).getLogradouro()) &&
-                    enderecos.get(e1).getNumero().equals(enderecos.get(e2).getNumero())
+                        enderecos.get(e1).getBairro().getCodigoBairro().equals(enderecos.get(e2).getBairro().getCodigoBairro()) &&
+                                enderecos.get(e1).getLogradouro().equals(enderecos.get(e2).getLogradouro()) &&
+                                enderecos.get(e1).getNumero().equals(enderecos.get(e2).getNumero())
                 ) {
                     throw new IllegalArgumentException("Não foi possível cadastrar os endereços pois os endereços que estão sendo cadastrados estão repetidos");
                 }
@@ -204,7 +201,6 @@ public class PessoaService {
         }
 
         pessoa.setEnderecos(enderecos);
-
 
         return pessoaRepository.save(pessoa);
     }
@@ -235,7 +231,31 @@ public class PessoaService {
             throw new IllegalArgumentException("Não foi possível alterar a Pessoa no banco de dados. Motivo: o campo status é obrigatório.");
         }
         if (pessoaDTO.enderecos() == null || pessoaDTO.enderecos().isEmpty()) {
-            throw new IllegalArgumentException("Não foi possível salvar a Pessoa no banco de dados. Motivo: o campo enderecos é obrigatório, informe pelo menos 1 endereço.");
+            throw new IllegalArgumentException("Não foi possível alterar a Pessoa no banco de dados. Motivo: o campo enderecos é obrigatório, informe pelo menos 1 endereço.");
+        }
+
+
+        //Validações dos valores dos campos
+        if (!(String.valueOf(pessoaDTO.codigoPessoa()).matches("^[0-9]+$"))) {
+            throw new IllegalArgumentException("O campo codigoPessoa deve conter apenas números inteiros positivos.");
+        }
+        if (!(pessoaDTO.nome().matches("^[A-ZÀ-Ÿ ]+$")) || pessoaDTO.nome().trim().isEmpty()) {
+            throw new IllegalArgumentException("O campo nome deve conter apenas letras em maiúsculo.");
+        }
+        if (!(pessoaDTO.sobrenome().matches("^[A-ZÀ-Ÿ ]+$")) || pessoaDTO.sobrenome().trim().isEmpty()) {
+            throw new IllegalArgumentException("O campo sobrenome deve conter apenas letras em maiúsculo.");
+        }
+        if (pessoaDTO.idade() < 0) {
+            throw new IllegalArgumentException("O campo idade deve ser um número inteiro não negativo.");
+        }
+        if (!pessoaDTO.login().matches("^[a-z0-9\\-_*@.]+$") || pessoaDTO.login().trim().isEmpty()) {
+            throw new IllegalArgumentException("Só são permitidos letras em letras minúsculas e sem acentos, números e os caracteres (.-_*@) e sem espaço.");
+        }
+        if (!pessoaDTO.senha().matches("^[a-z0-9]+$") || pessoaDTO.senha().trim().isEmpty()) {
+            throw new IllegalArgumentException("Só são permitidos letras em letras minúsculas e sem acentos, e números sem espaço.");
+        }
+        if (pessoaDTO.status() != 1 && pessoaDTO.status() != 2) {
+            throw new IllegalArgumentException("O campo status deve ser informado apenas os número 1 (ativado) ou 2 (desativado) .");
         }
 
 
@@ -255,31 +275,8 @@ public class PessoaService {
         if (pessoaDTO.login().length() < 8 || pessoaDTO.login().length() > 50) {
             throw new IllegalArgumentException("O campo login deve conter entre 8 e 50 caracteres");
         }
-
-
-        //Validações dos valores dos campos
-        if (!(String.valueOf(pessoaDTO.codigoPessoa()).matches("^[0-9]+$"))) {
-            throw new IllegalArgumentException("O campo codigoPessoa deve conter apenas números inteiros positivos.");
-        }
-        if (!(pessoaDTO.nome().matches("^[A-ZÀ-Ÿ ]+$")) || pessoaDTO.nome().trim().isEmpty()) {
-            throw new IllegalArgumentException("O campo nome deve conter apenas letras em maiúsculo.");
-        }
-        if (!(pessoaDTO.sobrenome().matches("^[A-ZÀ-Ÿ ]+$")) || pessoaDTO.sobrenome().trim().isEmpty()) {
-            throw new IllegalArgumentException("O campo sobrenome deve conter apenas letras em maiúsculo.");
-        }
-        if (pessoaDTO.idade() < 0) {
-            throw new IllegalArgumentException("O campo idade deve ser um número inteiro não negativo.");
-        }
-        if (pessoaDTO.login().length() < 8 || pessoaDTO.login().length() > 50 || !pessoaDTO.login().matches("^[a-z0-9\\-_*@.]+$")) {
-            throw new IllegalArgumentException("O campo login deve conter entre 8 e 50 caracteres em letras minúsculas e sem acentos. " +
-                    "Só são permitidos letras, números e os caracteres (.-_*@) e sem espaço.");
-        }
-        if (pessoaDTO.senha().length() < 4 || pessoaDTO.senha().length() > 50 || !pessoaDTO.senha().matches("^[a-z0-9]+$")) {
-            throw new IllegalArgumentException("O campo senha deve conter entre 4 e 50 caracteres em letras minúsculas e sem acentos. " +
-                    "Só são permitidos letras e números sem espaço.");
-        }
-        if (pessoaDTO.status() != 1 && pessoaDTO.status() != 2) {
-            throw new IllegalArgumentException("O campo status deve ser informado apenas os número 1 (ativado) ou 2 (desativado) .");
+        if (pessoaDTO.senha().length() < 4 || pessoaDTO.senha().length() > 50) {
+            throw new IllegalArgumentException("O campo senha deve conter entre 4 e 50 caracteres");
         }
 
 
@@ -353,27 +350,6 @@ public class PessoaService {
                     }
 
 
-                    //Validações dos tamanhos dos valores dos campos
-                    if (enderecoDTO.codigoEndereco() > 999999999) {
-                        throw new IllegalArgumentException("O campo codigoEndereco deve ter no máximo 9 dígitos");
-                    }
-                    if (enderecoDTO.codigoPessoa() > 999999999) {
-                        throw new IllegalArgumentException("O campo codigoPessoa deve ter no máximo 9 dígitos");
-                    }
-                    if (enderecoDTO.codigoBairro() > 999999999) {
-                        throw new IllegalArgumentException("O campo codigoBairro deve ter no máximo 9 dígitos");
-                    }
-                    if (enderecoDTO.nomeRua().length() > 256) {
-                        throw new IllegalArgumentException("O campo nomeRua deve conter no máximo 256 letras");
-                    }
-                    if (enderecoDTO.numero().length() > 10) {
-                        throw new IllegalArgumentException("O campo numero deve conter no máximo 10 caracteres");
-                    }
-                    if (enderecoDTO.complemento().length() > 20) {
-                        throw new IllegalArgumentException("O campo complemento deve conter no máximo 20 letras");
-                    }
-
-
                     //Validações dos valores dos campos
                     if (enderecoDTO.codigoEndereco() != null && !(String.valueOf(enderecoDTO.codigoEndereco()).matches("^[0-9]+$"))) {
                         throw new IllegalArgumentException("O campo codigoEndereco deve conter apenas números inteiros positivos.");
@@ -393,8 +369,29 @@ public class PessoaService {
                     if (!(enderecoDTO.complemento().matches("^[A-ZÀ-Ÿ ]+$")) || enderecoDTO.complemento().trim().isEmpty()) {
                         throw new IllegalArgumentException("O campo complemento deve conter apenas letras em maiúsculo.");
                     }
-                    if (!enderecoDTO.cep().matches("^\\d{5}-\\d{3}$")) {
+                    if (!enderecoDTO.cep().matches("^\\d{5}-\\d{3}$") || enderecoDTO.cep().trim().isEmpty()) {
                         throw new IllegalArgumentException("O campo CEP deve estar no formato '00000-000'.");
+                    }
+
+
+                    //Validações dos tamanhos dos valores dos campos
+                    if (enderecoDTO.codigoEndereco() > 999999999) {
+                        throw new IllegalArgumentException("O campo codigoEndereco deve ter no máximo 9 dígitos");
+                    }
+                    if (enderecoDTO.codigoPessoa() > 999999999) {
+                        throw new IllegalArgumentException("O campo codigoPessoa deve ter no máximo 9 dígitos");
+                    }
+                    if (enderecoDTO.codigoBairro() > 999999999) {
+                        throw new IllegalArgumentException("O campo codigoBairro deve ter no máximo 9 dígitos");
+                    }
+                    if (enderecoDTO.nomeRua().length() > 256) {
+                        throw new IllegalArgumentException("O campo nomeRua deve conter no máximo 256 letras");
+                    }
+                    if (enderecoDTO.numero().length() > 10) {
+                        throw new IllegalArgumentException("O campo numero deve conter no máximo 10 caracteres");
+                    }
+                    if (enderecoDTO.complemento().length() > 20) {
+                        throw new IllegalArgumentException("O campo complemento deve conter no máximo 20 letras");
                     }
 
 
@@ -417,11 +414,11 @@ public class PessoaService {
                     Endereco endereco = enderecoDTO.codigoEndereco() != null
                             ? enderecoRepository.findByCodigoEndereco(enderecoDTO.codigoEndereco())
                             : new Endereco();
-        //            O código acima é o mesmo que o código abaixo:
-        //            Endereco endereco = new Endereco();
-        //            if (enderecoDTO.codigoEndereco() != null) {
-        //                enderecoRepository.findByCodigoEndereco(enderecoDTO.codigoEndereco());
-        //            }
+                    //            O código acima é o mesmo que o código abaixo:
+                    //            Endereco endereco = new Endereco();
+                    //            if (enderecoDTO.codigoEndereco() != null) {
+                    //                enderecoRepository.findByCodigoEndereco(enderecoDTO.codigoEndereco());
+                    //            }
 
                     endereco.setLogradouro(enderecoDTO.nomeRua());
                     endereco.setNumero(enderecoDTO.numero());
@@ -438,12 +435,12 @@ public class PessoaService {
         // Não coloquei o cep porque tem chances de ser mudado e não coloquei o complemento porque é variável.
         System.out.println(enderecosNovosEAtualizados.size());
         if(enderecosNovosEAtualizados.size() > 1) {
-            for (int i = 0; i < enderecosNovosEAtualizados.size(); i++) {
+            for (int i = 0; i < enderecosNovosEAtualizados.size()-1; i++) {
                 int e1 = i, e2 = i + 1;
                 if(
                         enderecosNovosEAtualizados.get(e1).getBairro().getCodigoBairro().equals(enderecosNovosEAtualizados.get(e2).getBairro().getCodigoBairro()) &&
-                        enderecosNovosEAtualizados.get(e1).getLogradouro().equals(enderecosNovosEAtualizados.get(e2).getLogradouro()) &&
-                        enderecosNovosEAtualizados.get(e1).getNumero().equals(enderecosNovosEAtualizados.get(e2).getNumero())
+                                enderecosNovosEAtualizados.get(e1).getLogradouro().equals(enderecosNovosEAtualizados.get(e2).getLogradouro()) &&
+                                enderecosNovosEAtualizados.get(e1).getNumero().equals(enderecosNovosEAtualizados.get(e2).getNumero())
                 ) {
                     throw new IllegalArgumentException("Não foi possível alterar os endereços pois os endereços que estão sendo cadastrados estão repetidos");
                 }
@@ -457,18 +454,18 @@ public class PessoaService {
         ).toList();
 
         enderecosNoBanco.removeIf(
-            enderecoNoBanco -> {
-                boolean enderecoPresente = enderecosAtualizados.stream().anyMatch(
-                    enderecoAtualizado ->
-                        enderecoAtualizado.getCodigoEndereco().equals(enderecoNoBanco.getCodigoEndereco())
-                );
+                enderecoNoBanco -> {
+                    boolean enderecoPresente = enderecosAtualizados.stream().anyMatch(
+                            enderecoAtualizado ->
+                                    enderecoAtualizado.getCodigoEndereco().equals(enderecoNoBanco.getCodigoEndereco())
+                    );
 
-                if (!enderecoPresente) {
-                    enderecoRepository.delete(enderecoNoBanco);
+                    if (!enderecoPresente) {
+                        enderecoRepository.delete(enderecoNoBanco);
+                    }
+
+                    return !enderecoPresente;
                 }
-
-                return !enderecoPresente;
-            }
         );
 
         enderecosNoBanco.clear();
@@ -481,19 +478,9 @@ public class PessoaService {
 
         Pessoa resultado = null;
 
-
         //Sem parâmetros
         if (pessoaDTO.status() == null && pessoaDTO.codigoPessoa() == null && pessoaDTO.login() == null) {
             return ResponseEntity.ok(pessoaRepository.findAll().stream().map(PessoaMapper::mapearParaPessoa).toList());
-        }
-
-
-        //Validações do tamanho dos valores dos campos
-        if (pessoaDTO.codigoPessoa() != null && pessoaDTO.codigoPessoa() > 999999999) {
-            throw new IllegalArgumentException("O campo codigoPessoa deve ter no máximo 9 dígitos");
-        }
-        if (pessoaDTO.login() != null && (pessoaDTO.login().length() < 8 || pessoaDTO.login().length() > 50)) {
-            throw new IllegalArgumentException("O campo login deve conter entre 8 e 50 caracteres");
         }
 
 
@@ -506,6 +493,15 @@ public class PessoaService {
         }
         if (pessoaDTO.status() != null && pessoaDTO.status() != 1 && pessoaDTO.status() != 2) {
             throw new IllegalArgumentException("O campo status deve ser informado apenas os número 1 (ativado) ou 2 (desativado) .");
+        }
+
+
+        //Validações do tamanho dos valores dos campos
+        if (pessoaDTO.codigoPessoa() != null && pessoaDTO.codigoPessoa() > 999999999) {
+            throw new IllegalArgumentException("O campo codigoPessoa deve ter no máximo 9 dígitos");
+        }
+        if (pessoaDTO.login() != null && (pessoaDTO.login().length() < 8 || pessoaDTO.login().length() > 50)) {
+            throw new IllegalArgumentException("O campo login deve conter entre 8 e 50 caracteres");
         }
 
 

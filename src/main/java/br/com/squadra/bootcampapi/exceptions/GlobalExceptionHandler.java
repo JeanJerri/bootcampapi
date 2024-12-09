@@ -57,14 +57,14 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
     }
 
-//    @ExceptionHandler(Exception.class)  // Novo manipulador para erro 500
-//    public ResponseEntity<Map<String, Object>> handleException(Exception ex, HttpServletRequest request) {
-//        Map<String, Object> body = new HashMap<>();
-//        body.put("mensagem", "Ocorreu um erro interno no servidor. Por favor, tente novamente mais tarde.");
-//        body.put("status", 500);
-//
-//        return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
-//    }
+    @ExceptionHandler(Exception.class)  // Novo manipulador para erro 500
+    public ResponseEntity<Map<String, Object>> handleException(Exception ex, HttpServletRequest request) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("mensagem", "Ocorreu um erro interno no servidor. Por favor, tente novamente mais tarde.");
+        body.put("status", 500);
+
+        return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 
     private void handleUfMessages(HttpServletRequest request, Map<String, Object> body) {
         switch (request.getMethod()) {

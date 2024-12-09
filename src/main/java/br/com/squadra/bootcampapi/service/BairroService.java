@@ -35,15 +35,6 @@ public class BairroService {
         }
 
 
-        //Validações do tamanho dos valores dos campos
-        if (bairroDto.codigoMunicipio() > 999999999) {
-            throw new IllegalArgumentException("O campo codigoMunicipio deve ter no máximo 9 dígitos");
-        }
-        if (bairroDto.nome().length() > 256) {
-            throw new IllegalArgumentException("O campo nome deve conter no máximo 256 letras");
-        }
-
-
         //Validações dos valores dos campos
         if (!(String.valueOf(bairroDto.codigoMunicipio()).matches("^[0-9]+$"))) {
             throw new IllegalArgumentException("O campo codigoUF deve conter apenas números inteiros positivos.");
@@ -53,6 +44,15 @@ public class BairroService {
         }
         if (bairroDto.status() != 1 && bairroDto.status() != 2) {
             throw new IllegalArgumentException("O campo status deve ser informado apenas os número 1 (ativado) ou 2 (desativado).");
+        }
+
+
+        //Validações do tamanho dos valores dos campos
+        if (bairroDto.codigoMunicipio() > 999999999) {
+            throw new IllegalArgumentException("O campo codigoMunicipio deve ter no máximo 9 dígitos");
+        }
+        if (bairroDto.nome().length() > 256) {
+            throw new IllegalArgumentException("O campo nome deve conter no máximo 256 letras");
         }
 
 
@@ -95,18 +95,6 @@ public class BairroService {
         }
 
 
-        //Validações do tamanho dos valores dos campos
-        if (novoBairro.codigoBairro() > 999999999) {
-            throw new IllegalArgumentException("O campo codigoBairro deve ter no máximo 9 dígitos");
-        }
-        if (novoBairro.codigoMunicipio() > 999999999) {
-            throw new IllegalArgumentException("O campo codigoMunicipio deve ter no máximo 9 dígitos");
-        }
-        if (novoBairro.nome().length() > 256) {
-            throw new IllegalArgumentException("O campo nome deve conter no máximo 256 letras");
-        }
-
-
         //Validações dos valores dos campos
         if (!(String.valueOf(novoBairro.codigoBairro()).matches("^[0-9]+$"))) {
             throw new IllegalArgumentException("O campo codigoBairro deve conter apenas números inteiros positivos.");
@@ -119,6 +107,18 @@ public class BairroService {
         }
         if (novoBairro.status() != 1 && novoBairro.status() != 2) {
             throw new IllegalArgumentException("O campo status deve ser informado apenas os número 1 (ativado) ou 2 (desativado).");
+        }
+
+
+        //Validações do tamanho dos valores dos campos
+        if (novoBairro.codigoBairro() > 999999999) {
+            throw new IllegalArgumentException("O campo codigoBairro deve ter no máximo 9 dígitos");
+        }
+        if (novoBairro.codigoMunicipio() > 999999999) {
+            throw new IllegalArgumentException("O campo codigoMunicipio deve ter no máximo 9 dígitos");
+        }
+        if (novoBairro.nome().length() > 256) {
+            throw new IllegalArgumentException("O campo nome deve conter no máximo 256 letras");
         }
 
 
@@ -137,8 +137,8 @@ public class BairroService {
         List<Bairro> bairroRepetido = bairroRepository.findByMunicipioAndNome(municipio, novoBairro.nome());
         if (
                 !bairroRepetido.isEmpty() &&
-                !bairroRepetido.get(0).getCodigoBairro().equals(novoBairro.codigoBairro()) &&
-                bairroRepetido.get(0).getStatus().equals(novoBairro.status())
+                        !bairroRepetido.get(0).getCodigoBairro().equals(novoBairro.codigoBairro()) &&
+                        bairroRepetido.get(0).getStatus().equals(novoBairro.status())
         ) {
             throw new IllegalArgumentException("Não foi possível alterar o Bairro no banco de dados. Motivo: o Nome e o Município já existe em um outro registro cadastro no banco de dados.");
         }
@@ -165,7 +165,7 @@ public class BairroService {
     }
 
     public ResponseEntity<Object> pegar(List<Bairro> bairros, BairroDTO bairroDto) {
-        
+
         Bairro resultado = null;
         Municipio municipio = new Municipio();
         municipio.setCodigoMunicipio(bairroDto.codigoMunicipio());
@@ -174,18 +174,6 @@ public class BairroService {
         //Sem parâmetros
         if (bairroDto.status() == null && bairroDto.codigoBairro() == null && bairroDto.codigoMunicipio() == null && bairroDto.nome() == null) {
             return ResponseEntity.ok(bairroRepository.findAll().stream().map(BairroMapper::mapearParaBairro).toList());
-        }
-
-
-        //Validações do tamanho dos valores dos campos
-        if (bairroDto.codigoBairro() != null && bairroDto.codigoBairro() > 999999999) {
-            throw new IllegalArgumentException("O campo codigoBairro deve ter no máximo 9 dígitos");
-        }
-        if (bairroDto.codigoMunicipio() != null && bairroDto.codigoMunicipio() > 999999999) {
-            throw new IllegalArgumentException("O campo codigoMunicipio deve ter no máximo 9 dígitos");
-        }
-        if (bairroDto.nome() != null && bairroDto.nome().length() > 256) {
-            throw new IllegalArgumentException("O campo nome deve conter no máximo 256 letras");
         }
 
 
@@ -198,6 +186,18 @@ public class BairroService {
         }
         if (bairroDto.status() != null && bairroDto.status() != 1 && bairroDto.status() != 2) {
             throw new IllegalArgumentException("O campo status deve ser informado apenas os número 1 (ativado) ou 2 (desativado).");
+        }
+
+
+        //Validações do tamanho dos valores dos campos
+        if (bairroDto.codigoBairro() != null && bairroDto.codigoBairro() > 999999999) {
+            throw new IllegalArgumentException("O campo codigoBairro deve ter no máximo 9 dígitos");
+        }
+        if (bairroDto.codigoMunicipio() != null && bairroDto.codigoMunicipio() > 999999999) {
+            throw new IllegalArgumentException("O campo codigoMunicipio deve ter no máximo 9 dígitos");
+        }
+        if (bairroDto.nome() != null && bairroDto.nome().length() > 256) {
+            throw new IllegalArgumentException("O campo nome deve conter no máximo 256 letras");
         }
 
 
